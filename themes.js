@@ -19,7 +19,13 @@ const themes = [
     },
     {
         background: "texture"
-    }
+    },
+    {
+        background: "light"
+    },
+    {
+        background: "pasta"
+    },
 ]
 
 module.exports = {themes}
