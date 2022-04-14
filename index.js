@@ -5,7 +5,6 @@ const factGenerator = require('./factGenerator');
 const comms = require("./commands");
 const { themes } = require('./themes');
 var _ = require("lodash");
-const chunk = require('lodash.chunk');
 
 
 const token = process.env.BOT_TOKEN;
@@ -41,31 +40,39 @@ bot.start(async (ctx) => {
 // Обработчик команды /help
 bot.help((ctx) => ctx.replyWithMarkdown(getHelp()));
 
+let searchedBackground = "paper";
+const themesChunk = _.chunk(themes, 4);
 
 
-bot.hears('☸ Выбрать фон', ctx => ctx.reply(
-  'Выберите тему:',
-  inlineMessageThemes,
-));
+bot.hears('☸ Выбрать фон', (ctx) => {
+  ctx.reply(
+    'Выберите тему:',
+    Markup.inlineKeyboard(
+      themesChunk.map((chunk) => chunk.map((theme) => Markup.button.callback(theme.background, theme.background))),
+    ),
+  );
+
+}
+);
+
 bot.hears('🌚 Цитатка', ctx => ctx.reply('В разработке!'));
 bot.hears('📞 Контакты', ctx => ctx.reply('Yay!'));
 bot.hears('🔍 Помощь', ctx => ctx.replyWithMarkdown(getHelp()));
 
 
-const themesChunk = _.chunk(themes, 4);
-
-const inlineMessageThemes = Markup.inlineKeyboard(
-  themesChunk.map((chunk) => chunk.map((theme) => Markup.button.callback(theme.background, theme.background))),
-  // Markup.button.callback("Custom", "Custom")
-);
-
-
-// bot.command('inline', (ctx) => {
-//   ctx.reply(
-//     'Выберите тему:',
-//     inlineMessageThemes,
-//   );
-// })
+//принимает на вход callback от кнопки "Выбрать фон"
+bot.on('callback_query', async (ctx) => {
+  try {
+    ctx.reply('Идёт генерация фото, пожалуйста, подождите...')
+    let imagePath = `./temp/${uuidV4()}.jpg`
+    await factGenerator.generateImage(imagePath, ctx.update.callback_query.data)
+    await ctx.replyWithPhoto({ source: imagePath })
+    factGenerator.deleteImage(imagePath)
+  } catch (error) {
+    console.log('error', error)
+    ctx.reply('Ошибка отправки изображения')
+  }
+});
 
 bot.launch();
 
