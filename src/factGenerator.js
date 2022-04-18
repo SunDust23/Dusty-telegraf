@@ -4,12 +4,12 @@ const fs = require('fs')
 let { facts } = require('./facts')
 let { themes } = require('./themes')
 
-async function generateImage(imagePath, theme) {
-    let fact = randomFact()
+async function generateImage(imagePath, theme, fact) {
+    // let fact = randomFact()
     // let theme = randomBackground()
    // let photo = await getRandomImage(theme.background)
    let photo = await getRandomImage(theme)
-    await editImage(photo, imagePath, fact.fact)
+    await editImage(photo, imagePath, fact)
 }
 
 function randomFact() {
