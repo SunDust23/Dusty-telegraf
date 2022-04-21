@@ -3,8 +3,9 @@ require('dotenv').config();
 const { v4: uuidV4 } = require('uuid');
 const factGenerator = require('./src/factGenerator');
 const comms = require("./src/commands");
-const { getThemes } = require('./src/themes');
+// const { themes } = require('./src/themes');
 var _ = require("lodash");
+
 
 const sequelize = require('./db');
 const { User, Theme } = require('./models/models');
@@ -64,12 +65,23 @@ bot.start(async (ctx) => {
 // Обработчик команды /help
 bot.help((ctx) => ctx.replyWithMarkdown(getHelp()));
 
-let searchedBackground = "paper";
-const themes = getThemes();
-const themesChunk = _.chunk(themes, 4);
+// // const themes = getThemes();
+// const themesChunk = _.chunk(themes, 4);
 
 
-bot.hears('☸ Выбрать фон', (ctx) => {
+bot.hears('☸ Выбрать фон', async (ctx) => {
+  let themes = await Theme.findAll({attributes: ['background']});
+
+  var result = [];
+  for(let key in themes) {
+    let data = {
+      background: themes[key].background,
+    }
+    result.push(data);
+  }
+
+  const themesChunk = _.chunk(result, 4);
+
   ctx.reply(
     'Выберите тему:',
     Markup.inlineKeyboard(

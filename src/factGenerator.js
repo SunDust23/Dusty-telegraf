@@ -2,7 +2,6 @@ let { createClient } = require('pexels')
 let Jimp = require('jimp')
 const fs = require('fs')
 let { facts } = require('./facts')
-let { themes } = require('./themes')
 
 async function generateImage(imagePath, theme, fact) {
     // let fact = randomFact()
